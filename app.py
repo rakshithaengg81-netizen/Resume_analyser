@@ -8,7 +8,7 @@ from werkzeug.utils import secure_filename
 
 from services.resume_extractor import extract_text
 from services.skill_analyser import extract_skills, analyse_skills
-
+from services.video_recommender import recommend_videos
 
 app = Flask(__name__)
 
@@ -111,27 +111,23 @@ def analyze_resume():
 
         # Identify candidate skills
 
-        candidate_skills = extract_skills(
-            resume_text
-        )
+        candidate_skills = extract_skills(resume_text)
 
-        # Perform skill gap analysis
+        job_recommendations = analyse_skills(candidate_skills)
 
-        job_recommendations = analyse_skills(
-            candidate_skills
-        )
+        best_role = job_recommendations[0]
+
+        missing_skills = best_role["missing_skills"]
+
+        video_recommendations = recommend_videos(missing_skills)
 
         return jsonify({
-
-            "status": "success",
-
-            "message": "Resume analysed successfully",
-
-            "extracted_skills": candidate_skills,
-
-            "job_recommendations": job_recommendations
-
-        })
+    "status": "success",
+    "message": "Resume analysed successfully",
+    "extracted_skills": candidate_skills,
+    "job_recommendations": job_recommendations,
+    "video_recommendations": video_recommendations
+})
 
     except Exception as e:
 
