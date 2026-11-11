@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 from services.resume_extractor import extract_text
 from services.skill_analyser import extract_skills, analyse_skills
 from services.video_recommender import recommend_videos
-
+from services.interview_question_generator import generate_questions
 app = Flask(__name__)
 
 CORS(app)
@@ -112,7 +112,7 @@ def analyze_resume():
         # Identify candidate skills
 
         candidate_skills = extract_skills(resume_text)
-
+        interview_questions = generate_questions(candidate_skills)
         job_recommendations = analyse_skills(candidate_skills)
 
         best_role = job_recommendations[0]
@@ -126,7 +126,8 @@ def analyze_resume():
     "message": "Resume analysed successfully",
     "extracted_skills": candidate_skills,
     "job_recommendations": job_recommendations,
-    "video_recommendations": video_recommendations
+    "video_recommendations": video_recommendations,
+    "interview_questions": interview_questions
 })
 
     except Exception as e:
