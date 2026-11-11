@@ -10,6 +10,7 @@ from services.resume_extractor import extract_text
 from services.skill_analyser import extract_skills, analyse_skills
 from services.video_recommender import recommend_videos
 from services.interview_question_generator import generate_questions
+from services.answer_evaluator import evaluate_answers
 app = Flask(__name__)
 
 CORS(app)
@@ -144,6 +145,32 @@ def analyze_resume():
         if os.path.exists(filepath):
             os.remove(filepath)
 
+
+@app.route("/api/evaluate-interview", methods=["POST"])
+def evaluate_interview():
+    data = request.get_json()
+
+    if not data or "answers" not in data:
+        return jsonify({
+            "status": "error",
+            "message": "Please provide interview answers."
+        }), 400
+
+    answers = data["answers"]
+
+    if not isinstance(answers, list):
+        return jsonify({
+            "status": "error",
+            "message": "Answers must be provided as a list."
+        }), 400
+
+    result = evaluate_answers(answers)
+
+    return jsonify({
+        "status": "success",
+        "message": "Interview evaluation completed",
+        "evaluation": result
+    }), 200
 
 # Run backend server
 
